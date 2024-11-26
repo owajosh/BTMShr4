@@ -1,97 +1,56 @@
-<?php 
+<?php
+include 'sidebar.php';
+$conn = new mysqli("localhost", "root", "", "pogipoako");
+if ($conn->connect_error) die("Connection failed: " . $conn->connect_error);
 
-include "database.php";
-
-  if (isset($_POST['submit'])) {
-
-    $firstname = $_POST['firstname'];
-
-    $lastname = $_POST['lastname'];
-
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $fullname = $_POST['fullname'];
+    $contact = $_POST['contact'];
     $email = $_POST['email'];
-
-    $password = $_POST['password'];
-
     $gender = $_POST['gender'];
+    $employee_type = $_POST['employee_type'];
+    $department = $_POST['department'];
 
-    $sql = "INSERT INTO `ganda`(`firstname`, `lastname`, `email`, `password`, `gender`) VALUES ('$firstname','$lastname','$email','$password','$gender')";
+    $sql = "INSERT INTO employee (fullname, contact, email, gender, employee_type, department) 
+            VALUES (?, ?, ?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssssss", $fullname, $contact, $email, $gender, $employee_type, $department);
+    
+    if ($stmt->execute()) {
+        echo "Employee added successfully!";
+    } else {
+        echo "Error: " . $stmt->error;
+    }
 
-    $result = $conn->query($sql);
-
-    if ($result == TRUE) {
-
-      echo "New record created successfully.";
-
-    }else{
-
-      echo "Error:". $sql . "<br>". $conn->error;
-
-    } 
-
-    $conn->close(); 
-
-  }
-
+    $stmt->close();
+}
+$conn->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-
+    <title>Add Employee</title>
+</head>
 <body>
-
-<h2>Signup Form</h2>
-
-<form action="" method="POST">
-
-  <fieldset>
-
-    <legend>Personal information:</legend>
-
-    First name:<br>
-
-    <input type="text" name="firstname">
-
-    <br>
-
-    Last name:<br>
-
-    <input type="text" name="lastname">
-
-    <br>
-
-    Email:<br>
-
-    <input type="email" name="email">
-
-    <br>
-
-    Password:<br>
-
-    <input type="password" name="password">
-
-    <br>
-
-    Gender:<br>
-
-    <input type="radio" name="gender" value="Male">Male
-
-    <input type="radio" name="gender" value="Female">Female
-
-    <br><br>
-
-    <input type="submit" name="submit" value="submit">
-
-  </fieldset>
-
-</form>
-
+    <h2>Add New Employee</h2>
+    <form method="POST" action="">
+        Fullname: <input type="text" name="fullname" required><br>
+        Contact: <input type="text" name="contact"><br>
+        Email: <input type="email" name="email"><br>
+        Gender: 
+        <select name="gender" required>
+            <option value="M">Male</option>
+            <option value="F">Female</option>
+        </select><br>
+        Employee Type: 
+        <select name="employee_type" required>
+            <option value="Casual">Casual</option>
+            <option value="Part-Time">Part-Time</option>
+            <option value="Full-Time">Full-Time</option>
+        </select><br>
+        Department: <input type="text" name="department" required><br>
+        <button type="submit">Add Employee</button>
+    </form>
 </body>
-
 </html>
-    
-
-  
